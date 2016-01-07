@@ -9,5 +9,6 @@
         class="com.as_supportpe.notes.NoteList"
         android:id="@+id/titles_frag"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        tools:layout="@layout/list_note" />
 </FrameLayout>
