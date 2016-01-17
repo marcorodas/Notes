@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:id="@+id/second_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
-        android:id="@+id/list_element_date"
+        android:id="@+id/txtFecha"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -13,8 +14,8 @@
         android:gravity="end|center"
         android:textStyle="bold"
         tools:text="15/12/2015"/>
-    <TextView
-        android:id="@+id/list_element_title"
+    <EditText
+        android:id="@+id/editTxt_Titulo"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
@@ -22,12 +23,31 @@
         android:gravity="center"
         android:textSize="20sp"
         tools:text="Título"/>
-    <TextView
-        android:id="@+id/list_element_content"
+    <EditText
+        android:id="@+id/editTxt_Contenido"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="18"
         android:background="@color/colorAccent"
         android:textSize="18sp"
+        android:inputType="textMultiLine"
         tools:text="Contenido"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        >
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/btnSave"
+            android:id="@+id/btnSave" />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/btnCancel"
+            android:id="@+id/btnCancel" />
+    </LinearLayout>
 </LinearLayout>

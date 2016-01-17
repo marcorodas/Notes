@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.as_supportpe.notes.model.Note;
+import com.as_supportpe.notes.entities.Note;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -52,6 +52,7 @@ public class NoteListAdapter extends ArrayAdapter<Note> {
         public TextView date;
         public TextView title;
         public TextView content;
+        private static int CONTENT_MAX_LENGTH = 140;
 
         public ViewHolder(View containerView, int idResourceDate, int idResourceTitle, int idResourceContent) {
             this.date = (TextView) containerView.findViewById(idResourceDate);
@@ -61,7 +62,9 @@ public class NoteListAdapter extends ArrayAdapter<Note> {
 
         public void setNote(Note note){
             this.title.setText(note.getTitle());
-            this.content.setText(note.getContent());
+            String content = note.getContent();
+            content = content.substring(0,Math.min(content.length(), CONTENT_MAX_LENGTH));
+            this.content.setText(content);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(note.getTimestamp());
             String dateText = DateFormat.getDateInstance().format(calendar.getTime());

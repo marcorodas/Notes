@@ -1,5 +1,7 @@
 package com.as_supportpe.notes.model;
 
+import com.as_supportpe.notes.entities.Note;
+
 import java.util.ArrayList;
 
 /**

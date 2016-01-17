@@ -1,4 +1,4 @@
-package com.as_supportpe.notes.model;
+package com.as_supportpe.notes.entities;
 
 /**
  * Created by marco on 05/01/16.
