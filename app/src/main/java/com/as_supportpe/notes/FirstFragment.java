@@ -74,7 +74,7 @@ public class FirstFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     public void addNote(Note note){
-        noteListAdapter.add(note);
+        noteListAdapter.insert(note,0);
         noteListAdapter.notifyDataSetChanged();
     }
 

@@ -1,9 +1,12 @@
 package com.as_supportpe.notes;
 
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.as_supportpe.notes.entities.Note;
 import com.as_supportpe.notes.model.NoteManager;
@@ -49,7 +52,7 @@ public class MainActivity
 
     @Override
     public void onNoteSelected(Note note, int position) {
-        secondFragment.setNote(note,position);
+        secondFragment.setNote(note, position);
         if (isDualPanel) {
             secondFragment.setVisibility(true);
             secondFragment.displayNote();
@@ -69,12 +72,16 @@ public class MainActivity
 
     @Override
     public void btnSaveOnClick(Note note, int position) {
-        //TODO: Actualizar por ID (persistencia)
         if (note.getId() == Note.NEW_NOTE_ID){
+            //TODO: Crear nota (persistencia)
             firstFragment.addNote(note);
         }
         else{
+            //TODO: Actualizar por ID (persistencia)
             firstFragment.updateNote(note,position);
+        }
+        if (!isDualPanel){
+            fragmentManager.popBackStack();
         }
     }
 
@@ -88,5 +95,4 @@ public class MainActivity
             fragmentManager.popBackStack();
         }
     }
-
 }

@@ -1,11 +1,14 @@
 package com.as_supportpe.notes;
 
+import android.content.Context;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -70,7 +73,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     private boolean noteHasPendingChanges(){
         String txtTitle = editTxtTitle.getText().toString().trim();
         String txtContext = editTxtContent.getText().toString().trim();
-        return !txtTitle.equals(note.getTitle()) && !txtContext.equals(note.getContent());
+        return !txtTitle.equals(note.getTitle()) || !txtContext.equals(note.getContent());
     }
 
     @Override
@@ -79,6 +82,16 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         if (note!=null){
             setVisibility(true);
             displayNote();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        IBinder iBinder = getView().getWindowToken();
+        if (iBinder!=null){
+            imm.hideSoftInputFromWindow(iBinder, 0);
         }
     }
 

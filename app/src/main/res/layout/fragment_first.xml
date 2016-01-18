@@ -3,7 +3,6 @@
     android:id="@+id/first_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_dark"
     android:orientation="vertical">
     <Button
         android:id="@+id/btnNewNote"
@@ -13,6 +12,5 @@
     <ListView
         android:id="@+id/listview_note"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/holo_orange_light"></ListView>
+        android:layout_height="match_parent"></ListView>
 </LinearLayout>
