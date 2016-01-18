@@ -21,13 +21,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/btnEliminar"
-            android:id="@+id/btnEliminar" />
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/btnCancel"
-            android:id="@+id/btnCancel" />
+            android:id="@+id/btnDelete" />
     </LinearLayout>
     <TextView
         android:id="@+id/txtDate"
