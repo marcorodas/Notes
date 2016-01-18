@@ -3,4 +3,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="btnSave">Guardar</string>
     <string name="btnCancel">Cancelar</string>
+    <string name="btnNewNote">Nueva Nota</string>
+    <string name="btnEliminar">Eliminar</string>
 </resources>

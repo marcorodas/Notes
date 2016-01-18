@@ -65,10 +65,7 @@ public class NoteListAdapter extends ArrayAdapter<Note> {
             String content = note.getContent();
             content = content.substring(0,Math.min(content.length(), CONTENT_MAX_LENGTH));
             this.content.setText(content);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(note.getTimestamp());
-            String dateText = DateFormat.getDateInstance().format(calendar.getTime());
-            this.date.setText(dateText);
+            this.date.setText(note.getTimestampAsString());
         }
     }
 }

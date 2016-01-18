@@ -1,5 +1,7 @@
 package com.as_supportpe.notes.model;
 
+import android.support.annotation.Nullable;
+
 import com.as_supportpe.notes.entities.Note;
 
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.ArrayList;
  * Created by marco on 05/01/16.
  */
 public class NoteManager {
+    @Nullable
     public static ArrayList<Note> getNotes(){
         final ArrayList<Note> notes = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {

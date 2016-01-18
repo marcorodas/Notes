@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class FirstFragment extends ListFragment{
 
+
     private List<Note> notes;
     private OnNoteListener onNoteListener;
 
@@ -28,21 +29,28 @@ public class FirstFragment extends ListFragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        notes = NoteManager.getNotes();
-        NoteListAdapter noteListAdapter = new NoteListAdapter(getActivity(),notes);
-        setListAdapter(noteListAdapter);
+        if (notes!=null){
+            NoteListAdapter noteListAdapter = new NoteListAdapter(getActivity(),notes);
+            setListAdapter(noteListAdapter);
+        }
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        if (onNoteListener != null){
+        if (onNoteListener != null && notes != null){
             final Note note = notes.get(position);
             onNoteListener.onNoteSelected(note);
         }
     }
 
+    public void setNotes(List<Note> notes) {this.notes = notes;}
+
     public void setOnNoteListener(OnNoteListener onNoteListener) {
         this.onNoteListener = onNoteListener;
+    }
+
+    public List<Note> getNotes() {
+        return notes;
     }
 
     public interface OnNoteListener{
