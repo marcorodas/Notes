@@ -21,7 +21,7 @@ public class FirstFragment extends Fragment implements AdapterView.OnItemClickLi
     private ListView listView;
     private Button btnNewNote;
     private List<Note> notes;
-    private OnNoteListener onNoteListener;
+    private ActionListener actionListener;
     private NoteListAdapter noteListAdapter;
 
     @Override
@@ -45,28 +45,49 @@ public class FirstFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (onNoteListener != null && notes != null){
+        if (actionListener != null && notes != null){
             final Note note = notes.get(position);
-            onNoteListener.onNoteSelected(note);
+            actionListener.onNoteSelected(note,position);
         }
     }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btnNewNote){
-            final Note note = new Note(MainActivity.FLAG_NEW_NOTE_ID, "", "", System.currentTimeMillis());
-            ((MainActivity) getActivity()).onNoteSelected(note);
+        if (actionListener !=null){
+            switch (v.getId()){
+                case R.id.btnNewNote:
+                    actionListener.btnNewOnClick();
+                    break;
+            }
         }
     }
 
     public void setNotes(List<Note> notes) {this.notes = notes;}
 
-    public void setOnNoteListener(OnNoteListener onNoteListener) {
-        this.onNoteListener = onNoteListener;
+    public void setActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 
-    public interface OnNoteListener{
-        void onNoteSelected(final Note note);
+    public interface ActionListener {
+        void onNoteSelected(final Note note, int position);
+        void btnNewOnClick();
+    }
+
+    public void addNote(Note note){
+        noteListAdapter.add(note);
+        noteListAdapter.notifyDataSetChanged();
+    }
+
+    public void updateNote(Note note, int position){
+        final Note noteFromAdapter = noteListAdapter.getItem(position);
+        noteFromAdapter.setTitle(note.getTitle());
+        noteFromAdapter.setContent(note.getContent());
+        noteListAdapter.notifyDataSetChanged();
+    }
+
+    public void removeNote(int position){
+        noteListAdapter.remove(noteListAdapter.getItem(position));
+        noteListAdapter.notifyDataSetChanged();
     }
 
 }

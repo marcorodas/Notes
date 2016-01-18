@@ -4,23 +4,22 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.as_supportpe.notes.entities.Note;
 import com.as_supportpe.notes.model.NoteManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity
         extends AppCompatActivity
-        implements FirstFragment.OnNoteListener, SecondFragment.OnBtnClickListener {
+        implements
+        FirstFragment.ActionListener,
+        SecondFragment.OnBtnClickListener {
 
     private final FragmentManager fragmentManager = getSupportFragmentManager();
     private final FirstFragment firstFragment = new FirstFragment();
     private final SecondFragment secondFragment = new SecondFragment();
     private boolean isDualPanel;
-    public static int FLAG_NEW_NOTE_ID = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +29,11 @@ public class MainActivity
 
         final List<Note> notes = NoteManager.getNotes();
         firstFragment.setNotes(notes);
-        firstFragment.setOnNoteListener(this);
+        firstFragment.setActionListener(this);
         secondFragment.setOnBtnClickListener(this);
 
         if (notes != null && !notes.isEmpty()) {
-            secondFragment.setNote(notes.get(0));
+            secondFragment.setNote(notes.get(0), 0);
         }
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (isDualPanel) {
@@ -49,9 +48,10 @@ public class MainActivity
     }
 
     @Override
-    public void onNoteSelected(Note note) {
-        secondFragment.setNote(note);
+    public void onNoteSelected(Note note, int position) {
+        secondFragment.setNote(note,position);
         if (isDualPanel) {
+            secondFragment.setVisibility(true);
             secondFragment.displayNote();
         } else {
             fragmentManager
@@ -63,19 +63,30 @@ public class MainActivity
     }
 
     @Override
-    public void btnSaveOnClick(Note note) {
-        //TODO: Actualizar por ID (persistencia)
-        //TODO: Actualizar FirstFragment (update)
+    public void btnNewOnClick() {
+        onNoteSelected(new Note(), 0);
     }
 
     @Override
-    public void btnDeleteOnClick(Note note) {
+    public void btnSaveOnClick(Note note, int position) {
+        //TODO: Actualizar por ID (persistencia)
+        if (note.getId() == Note.NEW_NOTE_ID){
+            firstFragment.addNote(note);
+        }
+        else{
+            firstFragment.updateNote(note,position);
+        }
+    }
+
+    @Override
+    public void btnDeleteOnClick(Note note, int position) {
         //TODO: Eliminar por ID (persistencia)
-        //TODO: Actualizar FirstFragment (delete)
+        firstFragment.removeNote(position);
         if (isDualPanel) {
             secondFragment.setVisibility(false);
         } else {
             fragmentManager.popBackStack();
         }
     }
+
 }

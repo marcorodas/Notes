@@ -7,9 +7,10 @@ import java.util.Calendar;
  * Created by marco on 05/01/16.
  */
 public class Note {
+    public static int NEW_NOTE_ID = -1;
     private final long id;
-    private final String title;
-    private final String content;
+    private String title;
+    private String content;
     private final long timestamp;
 
     public Note(long id, String title, String content, long timestamp) {
@@ -17,6 +18,13 @@ public class Note {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
+    }
+
+    public Note() {
+        this.id = NEW_NOTE_ID;
+        this.title = "";
+        this.content = "";
+        this.timestamp = System.currentTimeMillis();
     }
 
     public long getId() {
@@ -39,5 +47,13 @@ public class Note {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timestamp);
         return DateFormat.getDateInstance().format(calendar.getTime());
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

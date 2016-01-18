@@ -24,6 +24,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     private EditText editTxtContent;
     private Note note;
     private OnBtnClickListener onBtnClickListener;
+    private int position;
 
     @Nullable
     @Override
@@ -56,11 +57,11 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
                                 editTxtContent.getText().toString().trim(),
                                 note.getTimestamp()
                         );
-                        onBtnClickListener.btnSaveOnClick(note);
+                        onBtnClickListener.btnSaveOnClick(note,position);
                     }
                     break;
                 case R.id.btnDelete:
-                    onBtnClickListener.btnDeleteOnClick(note);
+                    onBtnClickListener.btnDeleteOnClick(note,position);
                     break;
             }
         }
@@ -85,8 +86,9 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         this.onBtnClickListener = onBtnClickListener;
     }
 
-    public void setNote(Note note) {
+    public void setNote(Note note, int position) {
         this.note = note;
+        this.position = position;
     }
 
     public void setVisibility(final boolean isVisible){
@@ -99,7 +101,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     
     public void displayNote(){
         btnDelete.setVisibility(
-                note.getId() == MainActivity.FLAG_NEW_NOTE_ID ?
+                note.getId() == Note.NEW_NOTE_ID ?
                         View.INVISIBLE :
                         View.VISIBLE
         );
@@ -109,7 +111,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
     }
 
     public interface OnBtnClickListener{
-        void btnSaveOnClick(Note note);
-        void btnDeleteOnClick(Note note);
+        void btnSaveOnClick(Note note, int position);
+        void btnDeleteOnClick(Note note, int position);
     }
 }
