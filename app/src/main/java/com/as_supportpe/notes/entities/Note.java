@@ -7,8 +7,8 @@ import java.util.Calendar;
  * Created by marco on 05/01/16.
  */
 public class Note {
-    public static int NEW_NOTE_ID = -1;
-    private final long id;
+    public static final int NEW_NOTE_ID = -1;
+    private long id;
     private String title;
     private String content;
     private final long timestamp;
@@ -55,5 +55,9 @@ public class Note {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

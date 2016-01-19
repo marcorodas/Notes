@@ -1,15 +1,14 @@
 package com.as_supportpe.notes;
 
-import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.as_supportpe.notes.entities.Note;
 import com.as_supportpe.notes.model.NoteManager;
+import com.as_supportpe.notes.model.Response;
 
 import java.util.List;
 
@@ -72,27 +71,38 @@ public class MainActivity
 
     @Override
     public void btnSaveOnClick(Note note, int position) {
-        if (note.getId() == Note.NEW_NOTE_ID){
-            //TODO: Crear nota (persistencia)
-            firstFragment.addNote(note);
-        }
-        else{
-            //TODO: Actualizar por ID (persistencia)
-            firstFragment.updateNote(note,position);
-        }
-        if (!isDualPanel){
-            fragmentManager.popBackStack();
+        Boolean isNewNote = (note.getId() == Note.NEW_NOTE_ID);
+        Response response = isNewNote ?
+                NoteManager.createNote(note) :
+                NoteManager.updateNote(note);
+        note = (Note) response.getOutputObj();
+        if (response.isOK()) {
+            if (isNewNote) {
+                firstFragment.addNote(note);
+            } else {
+                firstFragment.updateNote(note, position);
+            }
+        } else {
+            showMessage(response.getErrorMessage());
         }
     }
 
     @Override
     public void btnDeleteOnClick(Note note, int position) {
-        //TODO: Eliminar por ID (persistencia)
-        firstFragment.removeNote(position);
-        if (isDualPanel) {
-            secondFragment.setVisibility(false);
+        Response response = NoteManager.deleteNote(note);
+        if (response.isOK()) {
+            firstFragment.removeNote(position);
+            if (isDualPanel) {
+                secondFragment.setVisibility(false);
+            } else {
+                fragmentManager.popBackStack();
+            }
         } else {
-            fragmentManager.popBackStack();
+            showMessage(response.getErrorMessage());
         }
+    }
+
+    private void showMessage(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
