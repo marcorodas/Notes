@@ -1,5 +1,6 @@
 package com.as_supportpe.notes;
 
+import android.os.PersistableBundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ public class MainActivity
     private final FirstFragment firstFragment = new FirstFragment();
     private final SecondFragment secondFragment = new SecondFragment();
     private boolean isDualPanel;
+    private List<Note> notes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +31,8 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         isDualPanel = findViewById(R.id.tablet_container) != null;
 
-        final List<Note> notes = NoteManager.getNotes();
+        notes = NoteManager.getNotes();
+
         firstFragment.setNotes(notes);
         firstFragment.setActionListener(this);
         secondFragment.setOnBtnClickListener(this);
@@ -82,7 +85,11 @@ public class MainActivity
             } else {
                 firstFragment.updateNote(note, position);
             }
-            if (!isDualPanel) {fragmentManager.popBackStack();}
+            if (isDualPanel) {
+                secondFragment.setVisibility(true);
+            } else {
+                fragmentManager.popBackStack();
+            }
         }
         showMessage(
                 response.isOK() ?
@@ -106,8 +113,8 @@ public class MainActivity
         }
         showMessage(
                 response.isOK() ?
-                "Nota '%1' Eliminada".replace("%1", note.getTitle())
-                : response.getErrorMessage());
+                        "Nota '%1' Eliminada".replace("%1", note.getTitle())
+                        : response.getErrorMessage());
     }
 
     public void showMessage(String message) {
