@@ -4,7 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by marco on 05/01/16.
@@ -47,9 +49,8 @@ public class Note implements Parcelable{
     }
 
     public String getTimestampAsString(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timestamp);
-        return DateFormat.getDateInstance().format(calendar.getTime());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm:ss:SSS", Locale.US);
+        return sdf.format(timestamp);
     }
 
     public void setTitle(String title) {
