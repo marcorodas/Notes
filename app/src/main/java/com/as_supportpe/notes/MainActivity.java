@@ -73,8 +73,8 @@ public class MainActivity
     public void btnSaveOnClick(Note note, int position) {
         Boolean isNewNote = (note.getId() == Note.NEW_NOTE_ID);
         Response response = isNewNote ?
-                NoteManager.createNote(note) :
-                NoteManager.updateNote(note);
+                NoteManager.createNote(note)
+                : NoteManager.updateNote(note);
         note = (Note) response.getOutputObj();
         if (response.isOK()) {
             if (isNewNote) {
@@ -82,9 +82,14 @@ public class MainActivity
             } else {
                 firstFragment.updateNote(note, position);
             }
-        } else {
-            showMessage(response.getErrorMessage());
         }
+        showMessage(
+                response.isOK() ?
+                        "Nota '%1' %2"
+                                .replace("%2", isNewNote ? "Creada" : "Modificada")
+                                .replace("%1", note.getTitle())
+                        : response.getErrorMessage()
+        );
     }
 
     @Override
@@ -97,12 +102,14 @@ public class MainActivity
             } else {
                 fragmentManager.popBackStack();
             }
-        } else {
-            showMessage(response.getErrorMessage());
         }
+        showMessage(
+                response.isOK() ?
+                "Nota '%1' Eliminada".replace("%1", note.getTitle())
+                : response.getErrorMessage());
     }
 
-    private void showMessage(String message){
+    public void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
