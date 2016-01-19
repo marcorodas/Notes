@@ -82,11 +82,12 @@ public class MainActivity
             } else {
                 firstFragment.updateNote(note, position);
             }
+            if (!isDualPanel) {fragmentManager.popBackStack();}
         }
         showMessage(
                 response.isOK() ?
                         "Nota '%1' %2"
-                                .replace("%2", isNewNote ? "Creada" : "Modificada")
+                                .replace("%2", isNewNote ? "Creada" : "Guardada")
                                 .replace("%1", note.getTitle())
                         : response.getErrorMessage()
         );

@@ -63,7 +63,7 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
                         onBtnClickListener.btnSaveOnClick(note,position);
                     }
                     else{
-                        ((MainActivity)getActivity()).showMessage("No se registran cambios ;)");
+                        ((MainActivity)getActivity()).showMessage("Sin cambios");
                     }
                     break;
                 case R.id.btnDelete:
