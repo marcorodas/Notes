@@ -25,6 +25,13 @@ public class Note implements Parcelable{
         this.timestamp = timestamp;
     }
 
+    public Note(long id, Note note){
+        this.id = id;
+        this.title = note.getTitle();
+        this.content = note.getContent();
+        this.timestamp = note.getTimestamp();
+    }
+
     public Note() {
         this.id = NEW_NOTE_ID;
         this.title = "";
