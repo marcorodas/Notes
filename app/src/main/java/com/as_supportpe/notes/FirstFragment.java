@@ -3,91 +3,114 @@ package com.as_supportpe.notes;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.as_supportpe.notes.entities.Note;
+import com.as_supportpe.notes.model.NoteManager;
 
 import java.util.List;
 
 /**
  * Created by marco on 05/01/16.
  */
-public class FirstFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener{
+public class FirstFragment extends Fragment {
 
-    private ListView listView;
-    private Button btnNewNote;
-    private List<Note> notes;
-    private ActionListener actionListener;
+    private NoteManager noteManager;
     private NoteListAdapter noteListAdapter;
+    private ListView listView;
+    private ActionListener actionListener;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        noteManager = NoteManager.getInstance(getContext());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_first, container, false);
+        View view = inflater.inflate(R.layout.fragment_first, container, false);
         listView = (ListView) view.findViewById(R.id.listview_note);
-        btnNewNote = (Button) view.findViewById(R.id.btnNewNote);
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (notes!=null){
-            noteListAdapter = new NoteListAdapter(getActivity(),notes);
-            listView.setAdapter(noteListAdapter);
-            listView.setOnItemClickListener(this);
-        }
-        btnNewNote.setOnClickListener(this);
+        final List<Note> list = noteManager.getNotes();
+        noteListAdapter = new NoteListAdapter(getActivity(), list);
+        listView.setAdapter(noteListAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (actionListener != null) {
+                    actionListener.onNoteSelected(list.get(position), position);
+                }
+            }
+        });
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (actionListener != null && notes != null){
-            final Note note = notes.get(position);
-            actionListener.onNoteSelected(note,position);
-        }
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_first, menu);
     }
 
     @Override
-    public void onClick(View v) {
-        if (actionListener !=null){
-            switch (v.getId()){
-                case R.id.btnNewNote:
-                    actionListener.btnNewOnClick();
-                    break;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (actionListener != null) {
+            switch (item.getItemId()) {
+                case R.id.menu_btnNewNote:
+                    actionListener.btnNewOnClick(noteManager, noteListAdapter);
+                    return true;
             }
         }
+        return false;
     }
-
-    public void setNotes(List<Note> notes) {this.notes = notes;}
 
     public void setActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 
+    public boolean addNote(Note note) {
+        Note responseNote = noteManager.createNote(note);
+        boolean responseOk = responseNote.getId() != NoteManager.NEW_NOTE_ID;
+        if (responseOk) {
+            noteListAdapter.insert(note, 0);
+            noteListAdapter.notifyDataSetChanged();
+        }
+        return responseOk;
+    }
+
+    public boolean updateNote(Note note, int position) {
+        boolean responseOk = noteManager.updateNote(note);
+        if (responseOk) {
+            Note noteFromAdapter = noteListAdapter.getItem(position);
+            noteFromAdapter.setTitle(note.getTitle());
+            noteFromAdapter.setContent(note.getContent());
+            noteListAdapter.notifyDataSetChanged();
+        }
+        return responseOk;
+    }
+
+    public boolean removeNote(Note note, int position) {
+        boolean responseOk = noteManager.deleteNote(note);
+        if (responseOk) {
+            noteListAdapter.remove(noteListAdapter.getItem(position));
+            noteListAdapter.notifyDataSetChanged();
+        }
+        return responseOk;
+    }
+
     public interface ActionListener {
         void onNoteSelected(final Note note, int position);
-        void btnNewOnClick();
-    }
 
-    public void addNote(Note note){
-        noteListAdapter.insert(note,0);
-        noteListAdapter.notifyDataSetChanged();
+        void btnNewOnClick(NoteManager noteManager, NoteListAdapter noteListAdapter);
     }
-
-    public void updateNote(Note note, int position){
-        final Note noteFromAdapter = noteListAdapter.getItem(position);
-        noteFromAdapter.setTitle(note.getTitle());
-        noteFromAdapter.setContent(note.getContent());
-        noteListAdapter.notifyDataSetChanged();
-    }
-
-    public void removeNote(int position){
-        noteListAdapter.remove(noteListAdapter.getItem(position));
-        noteListAdapter.notifyDataSetChanged();
-    }
-
 }

@@ -1,29 +1,21 @@
 package com.as_supportpe.notes;
 
-import android.os.PersistableBundle;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.widget.Toast;
 
 import com.as_supportpe.notes.entities.Note;
 import com.as_supportpe.notes.model.NoteManager;
-import com.as_supportpe.notes.model.Response;
 
-import java.util.List;
 
-public class MainActivity
-        extends AppCompatActivity
-        implements
-        FirstFragment.ActionListener,
-        SecondFragment.OnBtnClickListener {
+public class MainActivity extends AppCompatActivity implements FirstFragment.ActionListener {
 
+    private static final String FIRST_FRAGMENT_TAG = "list_fragment";
+    private static final String SECOND_FRAGMENT_TAG = "content_fragment";
     private final FragmentManager fragmentManager = getSupportFragmentManager();
-    private final FirstFragment firstFragment = new FirstFragment();
-    private final SecondFragment secondFragment = new SecondFragment();
     private boolean isDualPanel;
-    private List<Note> notes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,93 +23,76 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         isDualPanel = findViewById(R.id.tablet_container) != null;
 
-        notes = NoteManager.getNotes();
+        FirstFragment firstFragment = (savedInstanceState == null) ?
+                new FirstFragment() :
+                (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
 
-        firstFragment.setNotes(notes);
-        firstFragment.setActionListener(this);
-        secondFragment.setOnBtnClickListener(this);
-
-        if (notes != null && !notes.isEmpty()) {
-            secondFragment.setNote(notes.get(0), 0);
-        }
+        SecondFragment secondFragment = SecondFragment.getInstance(new Note(), 0);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (isDualPanel) {
             transaction
-                    .replace(R.id.first_fragment_container, firstFragment)
-                    .replace(R.id.second_fragment_container, secondFragment);
+                    .replace(R.id.first_fragment_container, firstFragment, FIRST_FRAGMENT_TAG)
+                    .replace(R.id.second_fragment_container, secondFragment, SECOND_FRAGMENT_TAG);
         } else {
             transaction
-                    .replace(R.id.handset_container, firstFragment);
+                    .replace(R.id.handset_container, firstFragment, FIRST_FRAGMENT_TAG);
+        }
+        transaction.commit();
+        firstFragment.setActionListener(this);
+    }
+
+    @Override
+    public void onNoteSelected(Note note, int position) {
+        SecondFragment secondFragment = SecondFragment.getInstance(note, position);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        if (isDualPanel) {
+            transaction
+                    .replace(R.id.second_fragment_container, secondFragment, SECOND_FRAGMENT_TAG);
+        } else {
+            transaction
+                    .replace(R.id.handset_container, secondFragment)
+                    .addToBackStack(null);
         }
         transaction.commit();
     }
 
     @Override
-    public void onNoteSelected(Note note, int position) {
-        secondFragment.setNote(note, position);
-        if (isDualPanel) {
-            secondFragment.setVisibility(true);
-            secondFragment.displayNote();
-        } else {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.handset_container, secondFragment)
-                    .addToBackStack(null)
-                    .commit();
-        }
-    }
-
-    @Override
-    public void btnNewOnClick() {
+    public void btnNewOnClick(NoteManager noteManager, NoteListAdapter noteListAdapter) {
         onNoteSelected(new Note(), 0);
     }
 
-    @Override
     public void btnSaveOnClick(Note note, int position) {
-        Boolean isNewNote = (note.getId() == Note.NEW_NOTE_ID);
-        Response response = isNewNote ?
-                NoteManager.createNote(note)
-                : NoteManager.updateNote(note);
-        note = (Note) response.getOutputObj();
-        if (response.isOK()) {
-            if (isNewNote) {
-                firstFragment.addNote(note);
-            } else {
+        FirstFragment firstFragment = (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
+        String message = null;
+        boolean isNewNote = note.getId() == NoteManager.NEW_NOTE_ID;
+        boolean isResponseOk = isNewNote ?
+                firstFragment.addNote(note) :
                 firstFragment.updateNote(note, position);
-            }
-            if (isDualPanel) {
-                secondFragment.setVisibility(true);
-            } else {
+        if (isResponseOk) {
+            if (!isDualPanel) {
                 fragmentManager.popBackStack();
             }
+            message = String.format("Nota '%s' ", note.getTitle())
+                    .concat(isNewNote ? "Creada" : "Guardada");
         }
-        showMessage(
-                response.isOK() ?
-                        "Nota '%1' %2"
-                                .replace("%2", isNewNote ? "Creada" : "Guardada")
-                                .replace("%1", note.getTitle())
-                        : response.getErrorMessage()
-        );
+        showMessage(message);
     }
 
-    @Override
     public void btnDeleteOnClick(Note note, int position) {
-        Response response = NoteManager.deleteNote(note);
-        if (response.isOK()) {
-            firstFragment.removeNote(position);
-            if (isDualPanel) {
-                secondFragment.setVisibility(false);
-            } else {
+        FirstFragment firstFragment = (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
+        boolean isResponseOk = firstFragment.removeNote(note, position);
+        String message = null;
+        if (isResponseOk) {
+            if (!isDualPanel) {
                 fragmentManager.popBackStack();
             }
+            message = String.format("Nota '%s' Eliminada", note.getTitle());
         }
-        showMessage(
-                response.isOK() ?
-                        "Nota '%1' Eliminada".replace("%1", note.getTitle())
-                        : response.getErrorMessage());
+        showMessage(message);
     }
 
     public void showMessage(String message) {
+        message = message == null ? "¡Ha ocurrido un error!" : message;
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

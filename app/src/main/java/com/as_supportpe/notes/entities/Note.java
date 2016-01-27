@@ -3,20 +3,30 @@ package com.as_supportpe.notes.entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.text.DateFormat;
+import com.as_supportpe.notes.model.NoteManager;
+
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 
 /**
  * Created by marco on 05/01/16.
  */
-public class Note implements Parcelable{
-    public static final int NEW_NOTE_ID = -1;
+public class Note implements Parcelable {
+    public static final Creator<Note> CREATOR = new Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
+    private final long timestamp;
     private long id;
     private String title;
     private String content;
-    private final long timestamp;
 
     public Note(long id, String title, String content, long timestamp) {
         this.id = id;
@@ -25,7 +35,7 @@ public class Note implements Parcelable{
         this.timestamp = timestamp;
     }
 
-    public Note(long id, Note note){
+    public Note(long id, Note note) {
         this.id = id;
         this.title = note.getTitle();
         this.content = note.getContent();
@@ -33,10 +43,25 @@ public class Note implements Parcelable{
     }
 
     public Note() {
-        this.id = NEW_NOTE_ID;
+        this.id = NoteManager.NEW_NOTE_ID;
         this.title = "";
         this.content = "";
         this.timestamp = System.currentTimeMillis();
+    }
+
+    protected Note(Parcel in) {
+        id = in.readLong();
+        title = in.readString();
+        content = in.readString();
+        timestamp = in.readLong();
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public long getId() {
@@ -55,28 +80,14 @@ public class Note implements Parcelable{
         return timestamp;
     }
 
-    public String getTimestampAsString(){
+    public String getTimestampAsString() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm:ss:SSS", Locale.US);
         return sdf.format(timestamp);
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    private Note(Parcel in){
-        this.id = in.readLong();
-        this.title = in.readString();
-        this.content = in.readString();
-        this.timestamp = in.readLong();
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -86,19 +97,4 @@ public class Note implements Parcelable{
         dest.writeString(content);
         dest.writeLong(timestamp);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Parcelable.Creator<Note> CREATOR = new Parcelable.Creator<Note>() {
-        public Note createFromParcel(Parcel in) {
-            return new Note(in);
-        }
-
-        public Note[] newArray(int size) {
-            return new Note[size];
-        }
-    };
 }

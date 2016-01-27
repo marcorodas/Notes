@@ -1,15 +1,17 @@
 package com.as_supportpe.notes;
 
 import android.content.Context;
-import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -18,16 +20,29 @@ import com.as_supportpe.notes.entities.Note;
 /**
  * Created by marco on 05/01/16.
  */
-public class SecondFragment extends Fragment implements View.OnClickListener {
+public class SecondFragment extends Fragment {
 
-    private Button btnSave;
-    private Button btnDelete;
+    private static final String NOTE = "note";
+    private static final String POSITION = "position";
+
     private TextView txtDate;
     private EditText editTxtTitle;
     private EditText editTxtContent;
-    private Note note;
-    private OnBtnClickListener onBtnClickListener;
-    private int position;
+
+    public static SecondFragment getInstance(Note note, int position) {
+        SecondFragment secondFragment = new SecondFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(NOTE, note);
+        bundle.putInt(POSITION, position);
+        secondFragment.setArguments(bundle);
+        return secondFragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Nullable
     @Override
@@ -36,56 +51,58 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         txtDate = (TextView) view.findViewById(R.id.txtDate);
         editTxtTitle = (EditText) view.findViewById(R.id.editTxt_Title);
         editTxtContent = (EditText) view.findViewById(R.id.editTxt_Content);
-        btnSave = (Button) view.findViewById(R.id.btnSave);
-        btnDelete = (Button) view.findViewById(R.id.btnDelete);
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        btnSave.setOnClickListener(this);
-        btnDelete.setOnClickListener(this);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_second, menu);
     }
 
     @Override
-    public void onClick(View v) {
-        if(onBtnClickListener!=null){
-            switch (v.getId()){
-                case R.id.btnSave:
-                    if(noteHasPendingChanges()){
-                        note = new Note(
-                                note.getId(),
-                                editTxtTitle.getText().toString().trim(),
-                                editTxtContent.getText().toString().trim(),
-                                note.getTimestamp()
-                        );
-                        onBtnClickListener.btnSaveOnClick(note,position);
-                    }
-                    else{
-                        ((MainActivity)getActivity()).showMessage("Sin cambios");
-                    }
-                    break;
-                case R.id.btnDelete:
-                    onBtnClickListener.btnDeleteOnClick(note,position);
-                    break;
-            }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        MainActivity mainActivity = ((MainActivity) getActivity());
+        Note note = getArguments().getParcelable(NOTE);
+        int position = getArguments().getInt(POSITION);
+        switch (item.getItemId()) {
+            case R.id.menu_btnSave:
+                if (noteHasPendingChanges(note)) {
+                    note = new Note(
+                            note.getId(),
+                            editTxtTitle.getText().toString(),
+                            editTxtContent.getText().toString(),
+                            note.getTimestamp()
+                    );
+                    mainActivity.btnSaveOnClick(note, position);
+                } else {
+                    mainActivity.showMessage("Sin cambios");
+                }
+                return true;
+            case R.id.menu_btnDelete:
+                mainActivity.btnDeleteOnClick(note, position);
+                return true;
         }
+        return false;
     }
 
-    private boolean noteHasPendingChanges(){
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        showNote();
+    }
+
+    private void showNote() {
+        Note note = getArguments().getParcelable(NOTE);
+        txtDate.setText(note.getTimestampAsString());
+        editTxtTitle.setText(note.getTitle());
+        editTxtContent.setText(note.getContent());
+    }
+
+    private boolean noteHasPendingChanges(Note note) {
         String txtTitle = editTxtTitle.getText().toString().trim();
         String txtContext = editTxtContent.getText().toString().trim();
         return !txtTitle.equals(note.getTitle()) || !txtContext.equals(note.getContent());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (note!=null){
-            setVisibility(true);
-            displayNote();
-        }
     }
 
     @Override
@@ -93,41 +110,8 @@ public class SecondFragment extends Fragment implements View.OnClickListener {
         super.onPause();
         final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         IBinder iBinder = getView().getWindowToken();
-        if (iBinder!=null){
+        if (iBinder != null) {
             imm.hideSoftInputFromWindow(iBinder, 0);
         }
-    }
-
-    public void setOnBtnClickListener(OnBtnClickListener onBtnClickListener) {
-        this.onBtnClickListener = onBtnClickListener;
-    }
-
-    public void setNote(Note note, int position) {
-        this.note = note;
-        this.position = position;
-    }
-
-    public void setVisibility(final boolean isVisible){
-        final int visibility = isVisible ? View.VISIBLE : View.INVISIBLE;
-        View[] views = {btnSave, btnDelete,txtDate,editTxtTitle,editTxtContent};
-        for (View view: views) {
-            view.setVisibility(visibility);
-        }
-    }
-    
-    public void displayNote(){
-        btnDelete.setVisibility(
-                note.getId() == Note.NEW_NOTE_ID ?
-                        View.INVISIBLE :
-                        View.VISIBLE
-        );
-        txtDate.setText(note.getTimestampAsString());
-        editTxtTitle.setText(note.getTitle());
-        editTxtContent.setText(note.getContent());
-    }
-
-    public interface OnBtnClickListener{
-        void btnSaveOnClick(Note note, int position);
-        void btnDeleteOnClick(Note note, int position);
     }
 }

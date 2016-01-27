@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.Nullable;
 
 import com.as_supportpe.notes.entities.Note;
 
@@ -16,19 +15,19 @@ import java.util.ArrayList;
  */
 public class NoteManager extends SQLiteOpenHelper {
 
-    public static final int TEST_MAX_NOTES = 20; //TODO: Por eliminar
-    public static int numNotes; //TODO: Por eliminar
-
-    private static NoteManager instance;
-
-    private final static String DATABASE_NAME = "notes";
-    private final static int DATABASE_VERSION = 1;
-
+    public static final int NEW_NOTE_ID = -1;
     public final static String TABLE_NOTES = "notes";
     public final static String NOTES_COLUMN_ID = "_id";
     public final static String NOTES_COLUMN_TITLE = "title";
     public final static String NOTES_COLUMN_CONTENT = "content";
     public final static String NOTES_COLUMN_CREATION_TIMESTAMP = "creationTimestamp";
+    private final static String DATABASE_NAME = "notes";
+    private final static int DATABASE_VERSION = 1;
+    private static NoteManager instance;
+
+    private NoteManager(final Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
 
     public static NoteManager getInstance(final Context context) {
         if (instance == null) {
@@ -37,22 +36,7 @@ public class NoteManager extends SQLiteOpenHelper {
         return instance;
     }
 
-    private NoteManager(final Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Nullable @Deprecated
-    public static ArrayList<Note> getNotes(){
-        final ArrayList<Note> notes = new ArrayList<>();
-        for (int i = 1; i <= TEST_MAX_NOTES; i++) {
-            final Note note = new Note(i,"Título "+i,"Contenido "+i,System.currentTimeMillis());
-            notes.add(note);
-        }
-        numNotes = TEST_MAX_NOTES;
-        return notes;
-    }
-
-    public ArrayList<Note> getNotesDB(){
+    public ArrayList<Note> getNotes() {
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         String query = "SELECT * FROM notes";
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
@@ -70,33 +54,17 @@ public class NoteManager extends SQLiteOpenHelper {
         return notes;
     }
 
-    @Deprecated
-    public static Response createNote(Note note) {
-        String errorMsj = "";
-        //TODO: Crear nueva nota, devolver ID (persistencia)
-        numNotes++;//TODO: Por eliminar
-        note.setId(numNotes);//TODO: Cambiar con el ID generado
-        return new Response(note,errorMsj,true);
-    }
-
-    public Note createNoteDB(Note note){
+    public Note createNote(Note note) {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(NOTES_COLUMN_TITLE, note.getTitle());
         contentValues.put(NOTES_COLUMN_CONTENT, note.getContent());
         contentValues.put(NOTES_COLUMN_CREATION_TIMESTAMP, note.getTimestamp());
         long id = sqLiteDatabase.insert(TABLE_NOTES, null, contentValues);
-        return new Note(id,note);
+        return new Note(id, note);
     }
 
-    @Deprecated
-    public static Response updateNote(Note note) {
-        String errorMsj = "";
-        //TODO: Actualizar nota usando ID (persistencia)
-        return new Response(note,errorMsj,true);
-    }
-
-    public boolean updateNoteDB(Note note){
+    public boolean updateNote(Note note) {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(NOTES_COLUMN_TITLE, note.getTitle());
@@ -110,14 +78,7 @@ public class NoteManager extends SQLiteOpenHelper {
         ) == 1;
     }
 
-    @Deprecated
-    public static Response deleteNote(Note note) {
-        String errorMsj = "";
-        //TODO: Eliminar nota usando ID (persistencia)
-        return new Response(note,errorMsj,true);
-    }
-
-    public boolean deleteNoteDB(Note note){
+    public boolean deleteNote(Note note) {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         return sqLiteDatabase.delete(
                 TABLE_NOTES,
