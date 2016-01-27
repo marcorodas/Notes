@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="3"
-        android:background="@android:color/holo_purple"
+        android:background="@color/colorTitle"
         android:gravity="center"
         android:textSize="20sp"
         tools:text="Título"/>
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:background="@color/colorAccent"
+        android:background="@color/colorContent"
         android:textSize="18sp"
         tools:text="Contenido"/>
 </LinearLayout>

@@ -20,7 +20,7 @@
         android:layout_height="0dp"
         android:layout_weight="2"
         android:gravity="center_vertical"
-        android:background="@android:color/holo_purple"
+        android:background="@color/colorTitle"
         android:textSize="28sp"
         android:textStyle="bold"
         tools:text="Título"/>
@@ -32,5 +32,6 @@
         android:textSize="18sp"
         android:gravity="top"
         android:inputType="textMultiLine"
+        android:background="@color/colorContent"
         tools:text="Contenido"/>
 </LinearLayout>
