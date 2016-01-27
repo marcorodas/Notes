@@ -79,8 +79,8 @@ public class FirstFragment extends Fragment {
     }
 
     public boolean addNote(Note note) {
-        Note responseNote = noteManager.createNote(note);
-        boolean responseOk = responseNote.getId() != NoteManager.NEW_NOTE_ID;
+        note = noteManager.createNote(note);
+        boolean responseOk = note.getId() != NoteManager.NEW_NOTE_ID;
         if (responseOk) {
             noteListAdapter.insert(note, 0);
             noteListAdapter.notifyDataSetChanged();

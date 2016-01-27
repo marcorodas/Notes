@@ -26,19 +26,13 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
 
         FirstFragment firstFragment = (savedInstanceState == null) ?
                 new FirstFragment() : getFirstFragment();
-        SecondFragment secondFragment = (savedInstanceState == null) ?
-                SecondFragment.getInstance(new Note(), 0) : getSecondFragment();
 
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        if (isDualPanel) {
-            transaction
-                    .replace(R.id.first_fragment_container, firstFragment, FIRST_FRAGMENT_TAG)
-                    .replace(R.id.second_fragment_container, secondFragment, SECOND_FRAGMENT_TAG);
-        } else {
-            transaction
-                    .replace(R.id.handset_container, firstFragment, FIRST_FRAGMENT_TAG);
-        }
-        transaction.commit();
+        fragmentManager.beginTransaction()
+                .replace(
+                        isDualPanel ? R.id.first_fragment_container : R.id.handset_container,
+                        firstFragment,
+                        FIRST_FRAGMENT_TAG)
+                .commit();
         firstFragment.setActionListener(this);
     }
 
@@ -78,8 +72,10 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
     public void onNoteSelected(Note note, int position) {
         SecondFragment secondFragment = SecondFragment.getInstance(note, position);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        int id_container = isDualPanel ? R.id.second_fragment_container : R.id.handset_container;
-        transaction.replace(id_container, secondFragment, SECOND_FRAGMENT_TAG);
+        transaction.replace(
+                isDualPanel ? R.id.second_fragment_container : R.id.handset_container,
+                secondFragment,
+                SECOND_FRAGMENT_TAG);
         if (!isDualPanel) {
             transaction.addToBackStack(null);
         }
@@ -92,14 +88,16 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
     }
 
     public void btnSaveOnClick(Note note, int position) {
-        FirstFragment firstFragment = (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
+        FirstFragment firstFragment = getFirstFragment();
         String message = null;
         boolean isNewNote = note.getId() == NoteManager.NEW_NOTE_ID;
         boolean isResponseOk = isNewNote ?
                 firstFragment.addNote(note) :
                 firstFragment.updateNote(note, position);
         if (isResponseOk) {
-            if (!isDualPanel) {
+            if (isDualPanel) {
+                onNoteSelected(note, isNewNote ? 0 : position);
+            } else {
                 fragmentManager.popBackStack();
             }
             message = String.format("Nota '%s' ", note.getTitle())
@@ -109,11 +107,15 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
     }
 
     public void btnDeleteOnClick(Note note, int position) {
-        FirstFragment firstFragment = (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
-        boolean isResponseOk = firstFragment.removeNote(note, position);
+        FirstFragment firstFragment = getFirstFragment();
         String message = null;
+        boolean isResponseOk = firstFragment.removeNote(note, position);
         if (isResponseOk) {
-            if (!isDualPanel) {
+            if (isDualPanel) {
+                fragmentManager.beginTransaction()
+                        .remove(getSecondFragment())
+                        .commit();
+            } else {
                 fragmentManager.popBackStack();
             }
             message = String.format("Nota '%s' Eliminada", note.getTitle());

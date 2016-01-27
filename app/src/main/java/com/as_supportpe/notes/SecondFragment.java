@@ -62,9 +62,10 @@ public class SecondFragment extends Fragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menu_btnDelete);
+        MenuItem btnDelete = menu.findItem(R.id.menu_btnDelete);
         Note note = getArguments().getParcelable(NOTE);
-        item.setVisible(note.getId() != NoteManager.NEW_NOTE_ID);
+        boolean isVisible = note.getId() != NoteManager.NEW_NOTE_ID;
+        btnDelete.setVisible(isVisible);
     }
 
     @Override
