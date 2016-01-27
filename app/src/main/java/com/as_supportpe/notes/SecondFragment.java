@@ -85,7 +85,9 @@ public class SecondFragment extends Fragment {
                     mainActivity.btnSaveOnClick(note, position);
                 } else {
                     mainActivity.showMessage("Sin cambios");
-                    mainActivity.getSupportFragmentManager().popBackStack();
+                    if (mainActivity.findViewById(R.id.handset_container) != null) {
+                        mainActivity.getSupportFragmentManager().popBackStack();
+                    }
                 }
                 return true;
             case R.id.menu_btnDelete:

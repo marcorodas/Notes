@@ -91,9 +91,13 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
         FirstFragment firstFragment = getFirstFragment();
         String message = null;
         boolean isNewNote = note.getId() == NoteManager.NEW_NOTE_ID;
-        boolean isResponseOk = isNewNote ?
-                firstFragment.addNote(note) :
-                firstFragment.updateNote(note, position);
+        boolean isResponseOk;
+        if(isNewNote){
+            note = firstFragment.addNote(note);
+            isResponseOk = note != null;
+        }else {
+            isResponseOk = firstFragment.updateNote(note, position);
+        }
         if (isResponseOk) {
             if (isDualPanel) {
                 onNoteSelected(note, isNewNote ? 0 : position);

@@ -78,14 +78,14 @@ public class FirstFragment extends Fragment {
         this.actionListener = actionListener;
     }
 
-    public boolean addNote(Note note) {
+    public Note addNote(Note note) {
         note = noteManager.createNote(note);
         boolean responseOk = note.getId() != NoteManager.NEW_NOTE_ID;
         if (responseOk) {
             noteListAdapter.insert(note, 0);
             noteListAdapter.notifyDataSetChanged();
         }
-        return responseOk;
+        return responseOk ? note : null;
     }
 
     public boolean updateNote(Note note, int position) {
