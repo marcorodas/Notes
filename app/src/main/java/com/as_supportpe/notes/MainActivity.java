@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
 
     private static final String FIRST_FRAGMENT_TAG = "list_fragment";
     private static final String SECOND_FRAGMENT_TAG = "content_fragment";
+    private final String SECOND_FRAGMENT_ISVISIBLE = "isVisible";
     private final FragmentManager fragmentManager = getSupportFragmentManager();
     private boolean isDualPanel;
 
@@ -24,10 +25,10 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
         isDualPanel = findViewById(R.id.tablet_container) != null;
 
         FirstFragment firstFragment = (savedInstanceState == null) ?
-                new FirstFragment() :
-                (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
+                new FirstFragment() : getFirstFragment();
+        SecondFragment secondFragment = (savedInstanceState == null) ?
+                SecondFragment.getInstance(new Note(), 0) : getSecondFragment();
 
-        SecondFragment secondFragment = SecondFragment.getInstance(new Note(), 0);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (isDualPanel) {
             transaction
@@ -41,17 +42,46 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Act
         firstFragment.setActionListener(this);
     }
 
+    private FirstFragment getFirstFragment() {
+        return (FirstFragment) fragmentManager.findFragmentByTag(FIRST_FRAGMENT_TAG);
+    }
+
+    private SecondFragment getSecondFragment() {
+        return (SecondFragment) fragmentManager.findFragmentByTag(SECOND_FRAGMENT_TAG);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (!isDualPanel) {
+            SecondFragment secondFragment = getSecondFragment();
+            boolean secondFragmentIsVisible = secondFragment != null && secondFragment.isVisible();
+            outState.putBoolean(SECOND_FRAGMENT_ISVISIBLE, secondFragmentIsVisible);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (!isDualPanel) {
+            boolean secondFragmentIsVisible = savedInstanceState.getBoolean(SECOND_FRAGMENT_ISVISIBLE);
+            if (secondFragmentIsVisible) {
+                SecondFragment secondFragment = getSecondFragment();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.handset_container, secondFragment, SECOND_FRAGMENT_TAG)
+                        .commit();
+            }
+        }
+    }
+
     @Override
     public void onNoteSelected(Note note, int position) {
         SecondFragment secondFragment = SecondFragment.getInstance(note, position);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        if (isDualPanel) {
-            transaction
-                    .replace(R.id.second_fragment_container, secondFragment, SECOND_FRAGMENT_TAG);
-        } else {
-            transaction
-                    .replace(R.id.handset_container, secondFragment)
-                    .addToBackStack(null);
+        int id_container = isDualPanel ? R.id.second_fragment_container : R.id.handset_container;
+        transaction.replace(id_container, secondFragment, SECOND_FRAGMENT_TAG);
+        if (!isDualPanel) {
+            transaction.addToBackStack(null);
         }
         transaction.commit();
     }

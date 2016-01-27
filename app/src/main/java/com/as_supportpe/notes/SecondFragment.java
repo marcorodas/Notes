@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.as_supportpe.notes.entities.Note;
+import com.as_supportpe.notes.model.NoteManager;
 
 /**
  * Created by marco on 05/01/16.
@@ -60,6 +61,13 @@ public class SecondFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.menu_btnDelete);
+        Note note = getArguments().getParcelable(NOTE);
+        item.setVisible(note.getId() != NoteManager.NEW_NOTE_ID);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         MainActivity mainActivity = ((MainActivity) getActivity());
         Note note = getArguments().getParcelable(NOTE);
@@ -76,6 +84,7 @@ public class SecondFragment extends Fragment {
                     mainActivity.btnSaveOnClick(note, position);
                 } else {
                     mainActivity.showMessage("Sin cambios");
+                    mainActivity.getSupportFragmentManager().popBackStack();
                 }
                 return true;
             case R.id.menu_btnDelete:
